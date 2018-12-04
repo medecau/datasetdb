@@ -1,6 +1,3 @@
-from collections import namedtuple
-from functools import partial
-
 from playhouse.dataset import DataSet
 import zerorpc
 
@@ -35,15 +32,16 @@ class Table:
 class Client:
     def __init__(self, address=None):
         if address is None:
-            address = 'tcp://127.0.0.1:4242'
+            address = "tcp://127.0.0.1:4242"
         self.c = zerorpc.Client(address)
 
     def __getitem__(self, name):
         return Table(self.c, name)
 
+
 class Service:
     def __init__(self):
-        self.db = DataSet('sqlite+pool:///db.sqlite')
+        self.db = DataSet("sqlite+pool:///db.sqlite")
 
     def insert(self, table, doc):
         return self.db[table].insert(**doc)
@@ -65,13 +63,8 @@ class Service:
     def all(self, table):
         return self.db[table].all()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     srv = zerorpc.Server(Service())
-    srv.bind('tcp://0.0.0.0:4242')
+    srv.bind("tcp://0.0.0.0:4242")
     srv.run()
-
-
-"""
-TODO:
-- use argparse to get binding address
-"""
