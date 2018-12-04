@@ -2,7 +2,34 @@ from collections import namedtuple
 from functools import partial
 import zerorpc
 
+
 table = namedtuple('Table', 'insert update delete find find_one all'.split(' '))
+class Table:
+    def __init__(self, c, name):
+        self.c = c
+        self.name = name
+
+    def insert(self, **kwargs):
+        return self.c.insert(self.name, kwargs)
+
+    def update(self, **kwargs):
+        return self.c.update(self.name, kwargs)
+
+    def delete(self, **kwargs):
+        return self.c.delete(self.name, kwargs)
+
+    def find(self, **kwargs):
+        return self.c.find(self.name, kwargs)
+
+    def find_one(self, **kwargs):
+        return self.c.find_one(self.name, kwargs)
+
+    def all(self):
+        return self.c.all(self.name)
+
+    def __iter__(self):
+        return self.all()
+
 
 class Client:
     def __init__(self, address=None):
@@ -10,37 +37,8 @@ class Client:
             address = 'tcp://127.0.0.1:4242'
         self.c = zerorpc.Client(address)
 
-    def _insert(self, table, **kwargs):
-        print(kwargs)
-        self.c.insert(table, kwargs)
-
-    def _update(self, table, **kwargs):
-        self.c.update(table, kwargs)
-
-    def _delete(self, table, **kwargs):
-        self.c.delete(table, kwargs)
-
-    def _find(self, table, **kwargs):
-        for record in self.c.find(table, kwargs):
-            yield record
-
-    def _find_one(self, table, **kwargs):
-        return self.c.find_one(table, kwargs)
-
-    def _all(self, table):
-        for record in self.c.all(table):
-            yield record
-
     def __getitem__(self, name):
-        return table(
-            partial(self._insert, name),
-            partial(self._update, name),
-            partial(self._delete, name),
-            partial(self._find, name),
-            partial(self._find_one, name),
-            partial(self._all, name)
-            )
+        return Table(self.c, name)
 
 
 c = Client()
-

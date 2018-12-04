@@ -34,7 +34,6 @@ srv.run()
 
 """
 TODO:
-- make table selectable. requires table object
 - bring the client code here
 - setup the server inside if __main__ block
 - use argparse to get binding address
